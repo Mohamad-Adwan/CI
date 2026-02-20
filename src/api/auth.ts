@@ -1,6 +1,5 @@
 // src/api/auth.ts
 
-// تعريف شكل (Type) مفتاح API
 export interface APIKey {
   key: string;
   userId: string;
@@ -8,59 +7,63 @@ export interface APIKey {
   expiresAt?: Date;
 }
 
-// مخزن مؤقت في الذاكرة لتخزين المفاتيح (لأغراض الاختبار)
-// في الواقع العملي، ستُحفظ هذه البيانات في قاعدة البيانات
-const apiKeys: Map<string, APIKey> = new Map();
+// مخزن المفاتيح - يجب أن يكون متاحاً للجميع
+export const apiKeys: Map<string, APIKey> = new Map();
 
-/**
- * توليد مفتاح API جديد لمستخدم معين
- * @param userId معرف المستخدم
- * @returns كائن APIKey الذي تم إنشاؤه
- */
 export function generateAPIKey(userId: string): APIKey {
-  // إنشاء مفتاح عشوائي بسيط (لأغراض تعليمية)
+  // إنشاء مفتاح عشوائي
   const key = `gk_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
+  
   const now = new Date();
   const apiKey: APIKey = {
     key,
     userId,
     createdAt: now,
-    // صلاحية المفتاح لمدة 30 يوماً من تاريخ الإنشاء
-    expiresAt: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
+    expiresAt: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000) // 30 يوم
   };
 
+  // حفظ المفتاح في الخريطة
   apiKeys.set(key, apiKey);
+  
+  // للتأكد - طباعة المفتاح المضاف
+  console.log(`Generated key: ${key} for user: ${userId}`);
+  
   return apiKey;
 }
 
-/**
- * الحصول على مفتاح API باستخدام نص المفتاح
- * @param apiKey نص المفتاح
- * @returns كائن APIKey إذا وجد وكان صالحاً، أو null إذا لم يوجد أو منتهي الصلاحية
- */
-export function getAPIKey(apiKey: string) {
-  // كسر متعمد - دائماً يرجع null
-  return null;
+export function getAPIKey(apiKey: string): APIKey | null {
+  console.log(`Looking for key: ${apiKey}`);
+  console.log(`Current keys in map:`, Array.from(apiKeys.keys()));
   
-  // الكود الأصلي:
-  // if (!apiKey) return null;
-  // return apiKeys.get(apiKey);
+  if (!apiKey || typeof apiKey !== 'string' || apiKey.trim() === '') {
+    console.log('Invalid input');
+    return null;
+  }
+
+  const key = apiKeys.get(apiKey);
+  
+  if (!key) {
+    console.log('Key not found');
+    return null;
+  }
+
+  if (key.expiresAt && key.expiresAt < new Date()) {
+    console.log('Key expired');
+    apiKeys.delete(apiKey);
+    return null;
+  }
+
+  console.log('Key found:', key);
+  return key;
 }
 
-/**
- * التحقق من صحة مفتاح API (هل هو موجود وغير منتهي الصلاحية)
- * @param apiKey نص المفتاح
- * @returns true إذا كان صالحاً، false إذا لم يكن
- */
 export function validateAPIKey(apiKey: string): boolean {
   return getAPIKey(apiKey) !== null;
 }
 
-/**
- * حذف مفتاح API
- * @param apiKey نص المفتاح المراد حذفه
- * @returns true إذا تم الحذف بنجاح، false إذا لم يكن موجوداً
- */
 export function deleteAPIKey(apiKey: string): boolean {
   return apiKeys.delete(apiKey);
 }
+
+// تصدير الخريطة أيضاً للاختبارات
+export const _test = { apiKeys };

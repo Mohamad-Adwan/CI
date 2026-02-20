@@ -1,18 +1,41 @@
-import { describe, expect, test, beforeEach } from "vitest";
-import { getAPIKey, generateAPIKey } from "../api/auth.js";
+import { describe, expect, test, beforeEach, afterEach } from "vitest";
+import { 
+  generateAPIKey, 
+  getAPIKey, 
+  validateAPIKey, 
+  deleteAPIKey,
+  apiKeys,
+  APIKey 
+} from "../api/auth.js";
 
 describe("API Key Functions", () => {
-  let testApiKey: string;
+  const testUserId = "test-user-123";
+  let generatedKey: APIKey;
 
   beforeEach(() => {
-    // إعداد مفتاح API للاختبار
-    testApiKey = generateAPIKey("test-user");
+    // تنظيف الخريطة قبل كل اختبار
+    apiKeys.clear();
+    
+    // إنشاء مفتاح جديد
+    generatedKey = generateAPIKey(testUserId);
+    console.log('BeforeEach - Generated key:', generatedKey);
+  });
+
+  afterEach(() => {
+    // تنظيف بعد كل اختبار
+    apiKeys.clear();
   });
 
   test("getAPIKey should return valid key", () => {
-    const result = getAPIKey(testApiKey);
+    console.log('Test - Looking for key:', generatedKey.key);
+    
+    const result = getAPIKey(generatedKey.key);
+    
+    console.log('Test - Result:', result);
+    
     expect(result).toBeDefined();
-    expect(result?.userId).toBe("test-user");
+    expect(result?.userId).toBe(testUserId);
+    expect(result?.key).toBe(generatedKey.key);
   });
 
   test("getAPIKey should return null for invalid key", () => {
@@ -21,7 +44,10 @@ describe("API Key Functions", () => {
   });
 
   test("getAPIKey should handle empty string", () => {
-    const result = getAPIKey("");
-    expect(result).toBeNull();
+    const result1 = getAPIKey("");
+    expect(result1).toBeNull();
+
+    const result2 = getAPIKey("   ");
+    expect(result2).toBeNull();
   });
 });
