@@ -1,5 +1,5 @@
 // src/api/auth.ts
-import { randomBytes } from 'crypto';
+import { randomBytes } from "crypto";
 
 export interface APIKey {
   key: string;
@@ -13,8 +13,8 @@ export const apiKeys: Map<string, APIKey> = new Map();
 
 export function generateAPIKey(userId: string): APIKey {
   // إنشاء مفتاح عشوائي آمن باستخدام crypto
-  const key = `gk_${randomBytes(16).toString('hex')}`;
-  
+  const key = `gk_${randomBytes(16).toString("hex")}`;
+
   const now = new Date();
   const apiKey: APIKey = {
     key,
