@@ -1,4 +1,5 @@
 // src/api/auth.ts
+import { randomBytes } from 'crypto';
 
 export interface APIKey {
   key: string;
@@ -11,8 +12,8 @@ export interface APIKey {
 export const apiKeys: Map<string, APIKey> = new Map();
 
 export function generateAPIKey(userId: string): APIKey {
-  // إنشاء مفتاح عشوائي
-  const key = `gk_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
+  // إنشاء مفتاح عشوائي آمن باستخدام crypto
+  const key = `gk_${randomBytes(16).toString('hex')}`;
   
   const now = new Date();
   const apiKey: APIKey = {
@@ -25,35 +26,25 @@ export function generateAPIKey(userId: string): APIKey {
   // حفظ المفتاح في الخريطة
   apiKeys.set(key, apiKey);
 
-  // للتأكد - طباعة المفتاح المضاف
-  console.log(`Generated key: ${key} for user: ${userId}`);
-
   return apiKey;
 }
 
 export function getAPIKey(apiKey: string): APIKey | null {
-  console.log(`Looking for key: ${apiKey}`);
-  console.log(`Current keys in map:`, Array.from(apiKeys.keys()));
-
   if (!apiKey || typeof apiKey !== "string" || apiKey.trim() === "") {
-    console.log("Invalid input");
     return null;
   }
 
   const key = apiKeys.get(apiKey);
 
   if (!key) {
-    console.log("Key not found");
     return null;
   }
 
   if (key.expiresAt && key.expiresAt < new Date()) {
-    console.log("Key expired");
     apiKeys.delete(apiKey);
     return null;
   }
 
-  console.log("Key found:", key);
   return key;
 }
 
@@ -64,13 +55,6 @@ export function validateAPIKey(apiKey: string): boolean {
 export function deleteAPIKey(apiKey: string): boolean {
   return apiKeys.delete(apiKey);
 }
-
-// =====================================================
-// مؤقتاً للاختبار - احذفها بعد التسليم
-// =====================================================
-const testEval = eval("2+2");
-console.log(testEval);
-// =====================================================
 
 // تصدير الخريطة أيضاً للاختبارات
 export const _test = { apiKeys };
