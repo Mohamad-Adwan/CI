@@ -12,5 +12,8 @@
   "description": "",
   "devDependencies": {
     "drizzle-kit": "^0.31.9"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.1"
   }
 }
