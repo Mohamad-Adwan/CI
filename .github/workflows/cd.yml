@@ -21,8 +21,8 @@ jobs:
       - run: npm ci
       
       # ✅ تشغيل الترحيلات (migrations) قبل بناء الصورة
-- name: Run database migrations
-  run: npx drizzle-kit migrate --config=drizzle.config.ts
+      - name: Run database migrations
+        run: npx drizzle-kit migrate --config=drizzle.config.ts
       
       - run: npm run build
       
