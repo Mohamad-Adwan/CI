@@ -20,7 +20,11 @@ jobs:
       
       - run: npm ci
       
-      # ✅ تشغيل الترحيلات (migrations) قبل بناء الصورة
+      # ✅ توليد ملفات الترحيلات من الـ schema
+      - name: Generate migrations
+        run: npx drizzle-kit generate --config=drizzle.config.ts
+      
+      # ✅ تنفيذ الترحيلات على قاعدة البيانات
       - name: Run database migrations
         run: npx drizzle-kit migrate --config=drizzle.config.ts
       
